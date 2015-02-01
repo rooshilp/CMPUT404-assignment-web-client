@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # coding: utf-8
-# Copyright 2013 Abram Hindle
+# Copyright 2015 Abram Hindle, Rooshil Patel
 # 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -37,7 +37,29 @@ class HTTPClient(object):
 
     def connect(self, host, port):
         # use sockets!
-        return None
+        try:
+            s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+       
+        except socket_error as error_code:
+            print("Failed to create socket!")
+            print("Error code: " + str(error_code[0]) + 
+                  ". Error Message: " + error_code[1])
+            sys.exit()
+
+        print("Socket created successfully!")
+
+        try:
+            s.bind(host, port)
+
+        except socket_error as error_code:
+            print("Failed to bind!")
+            print("Error code: " + str(error_code[0]) + 
+                  ". Error Message: " + error_code[1])
+            sys.exit()
+
+        print("Socket sucessfully bound")
+
+        return s
 
     def get_code(self, data):
         return None
