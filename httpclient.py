@@ -61,7 +61,7 @@ class HTTPClient(object):
         return s
 
     def get_code(self, data):
-        code = data.split()[1]
+        code = data.split(" ")[1]
 
         return code
 
@@ -102,14 +102,17 @@ class HTTPClient(object):
         request = "GET %s HTTP/1.1\r\n" % path
         request += "Host: %s\r\n\r\n" % net_loc
         
-        s.send(request)
+        print(request)
+        
+        s.sendall(request)
         
         data = self.recvall(s)
+        print(data)
 
         code = self.get_code(data)
         body = self.get_body(data)
 
-        return HTTPRequest(code, body)
+        return HTTPRequest(int(code), body)
 
     def POST(self, url, args=None):
         url2 = urlparse.urlparse(url)
@@ -123,15 +126,18 @@ class HTTPClient(object):
        
         s = self.connect(host, port)
         
+        content = ""
         if args is not None:
             content = urllib.urlencode(args)
-
+        
         content_length = len(content)
+      
 
         request = "POST %s HTTP/1.1\r\n" % path
         request += "Host: %s\r\n" % net_loc
         request += "Content Type: application/x-www-form-urlencoded\r\n"
         request += "Content Length: %i\r\n\r\n" % content_length
+        request += content
 
         s.send(request)
         
@@ -140,7 +146,7 @@ class HTTPClient(object):
         code = self.get_code(data)
         body = self.get_body(data)
         
-        return HTTPRequest(code, body)
+        return HTTPRequest(int(code), body)
 
     def command(self, command, url, args=None):
         if (command == "POST"):
