@@ -102,12 +102,9 @@ class HTTPClient(object):
         request = "GET %s HTTP/1.1\r\n" % path
         request += "Host: %s\r\n\r\n" % net_loc
         
-        print(request)
-        
         s.sendall(request)
         
         data = self.recvall(s)
-        print(data)
 
         code = self.get_code(data)
         body = self.get_body(data)
@@ -135,11 +132,11 @@ class HTTPClient(object):
 
         request = "POST %s HTTP/1.1\r\n" % path
         request += "Host: %s\r\n" % net_loc
-        request += "Content Type: application/x-www-form-urlencoded\r\n"
-        request += "Content Length: %i\r\n\r\n" % content_length
+        request += "Content-Type: application/x-www-form-urlencoded\r\n"
+        request += "Content-Length: %i\r\n\r\n" % content_length
         request += content
 
-        s.send(request)
+        s.sendall(request)
         
         data = self.recvall(s)
         
