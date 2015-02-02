@@ -61,13 +61,19 @@ class HTTPClient(object):
         return s
 
     def get_code(self, data):
-        return None
+        code = data.split()[1]
+
+        return code
 
     def get_headers(self,data):
-        return None
+        headers = data.split("\r\n\r\n")[0]
+
+        return headers
 
     def get_body(self, data):
-        return None
+        body = data.split("\r\n\r\n")[1]
+
+        return body
 
     # read everything from the socket
     def recvall(self, sock):
@@ -92,6 +98,11 @@ class HTTPClient(object):
             port = 80
        
         s = self.connect(host, port)
+        
+        request = "GET %s HTTP/1.1\r\n" % path
+        request + "Host: %s\r\n\r\n" % net_loc
+        
+        
 
         code = self.get_code(data)
         body = self.get_body(data)
