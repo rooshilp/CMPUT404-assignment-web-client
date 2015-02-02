@@ -23,6 +23,7 @@ import socket
 import re
 # you may use urllib to encode data appropriately
 import urllib
+import urlparse
 
 def help():
     print "httpclient.py [GET/POST] [URL]\n"
@@ -33,7 +34,7 @@ class HTTPRequest(object):
         self.body = body
 
 class HTTPClient(object):
-    #def get_host_port(self,url):
+    #def get_host_port(self, url):
 
     def connect(self, host, port):
         # use sockets!
@@ -49,15 +50,15 @@ class HTTPClient(object):
         print("Socket created successfully!")
 
         try:
-            s.bind(host, port)
+            s.connect(host, port)
 
         except socket_error as error_code:
-            print("Failed to bind!")
+            print("Failed to connect!")
             print("Error code: " + str(error_code[0]) + 
                   ". Error Message: " + error_code[1])
             sys.exit()
 
-        print("Socket sucessfully bound")
+        print("Socket sucessfully connected!")
 
         return s
 
@@ -83,6 +84,13 @@ class HTTPClient(object):
         return str(buffer)
 
     def GET(self, url, args=None):
+        url2 = urlparse.urlparse(url)
+        host = url2.hostname
+        port = url2.port
+        if port:
+            port = 80
+        s = self.connect(host, port)
+
         code = 500
         body = ""
         return HTTPRequest(code, body)
@@ -92,7 +100,7 @@ class HTTPClient(object):
         body = ""
         return HTTPRequest(code, body)
 
-    def command(self, url, command="GET", args=None):
+    def command(self, command, url, args=None):
         if (command == "POST"):
             return self.POST( url, args )
         else:
