@@ -34,8 +34,6 @@ class HTTPRequest(object):
         self.body = body
 
 class HTTPClient(object):
-    #def get_host_port(self, url):
-
     def connect(self, host, port):
         # use sockets!
         try:
@@ -87,15 +85,24 @@ class HTTPClient(object):
         url2 = urlparse.urlparse(url)
         host = url2.hostname
         port = url2.port
-        if port:
+        path = url2.path
+        net_loc = url2.netloc
+
+        if port is None:
             port = 80
+       
         s = self.connect(host, port)
 
-        code = 500
-        body = ""
+        code = self.get_code(data)
+        body = self.get_body(data)
+
         return HTTPRequest(code, body)
 
     def POST(self, url, args=None):
+        
+        if args is not None:
+            content = urllib.urlencode(args)
+
         code = 500
         body = ""
         return HTTPRequest(code, body)
