@@ -39,7 +39,7 @@ class HTTPClient(object):
         try:
             s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
        
-        except socket_error as error_code:
+        except socket.error as error_code:
             print("Failed to create socket!")
             print("Error code: " + str(error_code[0]) + 
                   ". Error Message: " + error_code[1])
@@ -48,9 +48,9 @@ class HTTPClient(object):
         print("Socket created successfully!")
 
         try:
-            s.connect(host, port)
+            s.connect((host, port))
 
-        except socket_error as error_code:
+        except socket.error as error_code:
             print("Failed to connect!")
             print("Error code: " + str(error_code[0]) + 
                   ". Error Message: " + error_code[1])
@@ -100,9 +100,11 @@ class HTTPClient(object):
         s = self.connect(host, port)
         
         request = "GET %s HTTP/1.1\r\n" % path
-        request + "Host: %s\r\n\r\n" % net_loc
+        request += "Host: %s\r\n\r\n" % net_loc
         
+        s.send(request)
         
+        data = self.recvall(s)
 
         code = self.get_code(data)
         body = self.get_body(data)
@@ -110,12 +112,34 @@ class HTTPClient(object):
         return HTTPRequest(code, body)
 
     def POST(self, url, args=None):
+        url2 = urlparse.urlparse(url)
+        host = url2.hostname
+        port = url2.port
+        path = url2.path
+        net_loc = url2.netloc
+
+        if port is None:
+            port = 80
+       
+        s = self.connect(host, port)
         
         if args is not None:
             content = urllib.urlencode(args)
 
-        code = 500
-        body = ""
+        content_length = len(content)
+
+        request = "POST %s HTTP/1.1\r\n" % path
+        request += "Host: %s\r\n" % net_loc
+        request += "Content Type: application/x-www-form-urlencoded\r\n"
+        request += "Content Length: %i\r\n\r\n" % content_length
+
+        s.send(request)
+        
+        data = self.recvall(s)
+        
+        code = self.get_code(data)
+        body = self.get_body(data)
+        
         return HTTPRequest(code, body)
 
     def command(self, command, url, args=None):
