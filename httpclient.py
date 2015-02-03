@@ -34,6 +34,15 @@ class HTTPRequest(object):
         self.body = body
 
 class HTTPClient(object):
+    def get_host_port(self, url_parsed):
+        host = url_parsed.hostname
+        port = url_parsed.port
+
+        if port is None:
+            port = 80
+
+        return host, port
+
     def connect(self, host, port):
         # use sockets!
         try:
@@ -88,14 +97,10 @@ class HTTPClient(object):
         return str(buffer)
 
     def GET(self, url, args=None):
-        url2 = urlparse.urlparse(url)
-        host = url2.hostname
-        port = url2.port
-        path = url2.path
-        net_loc = url2.netloc
-
-        if port is None:
-            port = 80
+        url_parsed = urlparse.urlparse(url)
+        host, port = self.get_host_port(url_parsed)
+        path = url_parsed.path
+        net_loc = url_parsed.netloc
        
         s = self.connect(host, port)
         
@@ -112,14 +117,10 @@ class HTTPClient(object):
         return HTTPRequest(int(code), body)
 
     def POST(self, url, args=None):
-        url2 = urlparse.urlparse(url)
-        host = url2.hostname
-        port = url2.port
-        path = url2.path
-        net_loc = url2.netloc
-
-        if port is None:
-            port = 80
+        url_parsed = urlparse.urlparse(url)
+        host, port = self.get_host_port(url_parsed)
+        path = url_parsed.path
+        net_loc = url_parsed.netloc
        
         s = self.connect(host, port)
         
@@ -129,7 +130,6 @@ class HTTPClient(object):
         
         content_length = len(content)
       
-
         request = "POST %s HTTP/1.1\r\n" % path
         request += "Host: %s\r\n" % net_loc
         request += "Content-Type: application/x-www-form-urlencoded\r\n"
