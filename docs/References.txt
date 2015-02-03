@@ -1,0 +1,9 @@
+References
+
+http://tools.ietf.org/html/rfc2616 - used to understand HTTP request headers and which are required.
+
+Firefox Inspect Element network tool - used to see what headers are sent for simple GET and POST requests
+
+https://docs.python.org/2/library/urlparse.html - used to understand usage of urlparse
+
+CMPUT 410 Lab 2 - lab example used for socket connection
