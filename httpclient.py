@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # coding: utf-8
-# Copyright 2015 Abram Hindle, Rooshil Patel
+# Copyright 2015 Abram Hindle and Rooshil Patel
 # 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -18,6 +18,8 @@
 # Write your own HTTP GET and POST
 # The point is to understand what you have to send and get experience with it
 
+# HTTPClient implementation completed by Rooshil Patel
+
 import sys
 import socket
 import re
@@ -34,15 +36,18 @@ class HTTPRequest(object):
         self.body = body
 
 class HTTPClient(object):
+    # gets the host and port information from a urlparse'd url
     def get_host_port(self, url_parsed):
         host = url_parsed.hostname
         port = url_parsed.port
 
+        # if no port is provided, default is set to 80
         if port is None:
             port = 80
 
         return host, port
 
+    # creates a socket and connects it to the provided host and port
     def connect(self, host, port):
         # use sockets!
         try:
@@ -55,7 +60,7 @@ class HTTPClient(object):
             sys.exit()
 
         print("Socket created successfully!")
-
+        
         try:
             s.connect((host, port))
 
@@ -69,16 +74,19 @@ class HTTPClient(object):
 
         return s
 
+    # returns the HTTP code received from the connected host
     def get_code(self, data):
         code = data.split(" ")[1]
 
         return code
 
+    # returns the header received from the connected host
     def get_headers(self,data):
         headers = data.split("\r\n\r\n")[0]
 
         return headers
 
+    # returns the body of content received from the connected host
     def get_body(self, data):
         body = data.split("\r\n\r\n")[1]
 
@@ -96,6 +104,7 @@ class HTTPClient(object):
                 done = not part
         return str(buffer)
 
+    # 
     def GET(self, url, args=None):
         url_parsed = urlparse.urlparse(url)
         host, port = self.get_host_port(url_parsed)
@@ -115,7 +124,8 @@ class HTTPClient(object):
         body = self.get_body(data)
 
         return HTTPRequest(int(code), body)
-
+    
+    # 
     def POST(self, url, args=None):
         url_parsed = urlparse.urlparse(url)
         host, port = self.get_host_port(url_parsed)
