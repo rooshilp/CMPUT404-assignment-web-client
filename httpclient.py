@@ -104,42 +104,54 @@ class HTTPClient(object):
                 done = not part
         return str(buffer)
 
-    # 
+    # method parses url provided, creates and connects a socket to the parsed host and port,
+    # generates an HTTP GET request, sends the request, waits for a response, parses the 
+    # response and returns an HTTPRequest object with the parsed info.
     def GET(self, url, args=None):
+        # parses url with the urlparse library and retrieves the required information
         url_parsed = urlparse.urlparse(url)
         host, port = self.get_host_port(url_parsed)
         path = url_parsed.path
         net_loc = url_parsed.netloc
        
+        # creates and connects a socket using host and port
         s = self.connect(host, port)
         
+        # generates HTTP GET request
         request = "GET %s HTTP/1.1\r\n" % path
         request += "Host: %s\r\n\r\n" % net_loc
         
         s.sendall(request)
         
         data = self.recvall(s)
-
+        
+        # parses received data from host
         code = self.get_code(data)
         body = self.get_body(data)
 
         return HTTPRequest(int(code), body)
     
-    # 
+    # method parses url provided, creates and connects a socket to the parsed host and port,
+    # encodes any arguments provided, generates an HTTP POST request, sends the request, 
+    # waits for a response, parses the response and returns an HTTPRequest object with the parsed info.
     def POST(self, url, args=None):
+        # parses url with the urlparse library and retrieves the required information
         url_parsed = urlparse.urlparse(url)
         host, port = self.get_host_port(url_parsed)
         path = url_parsed.path
         net_loc = url_parsed.netloc
        
+        # creates and connects a socket using host and port
         s = self.connect(host, port)
         
+        # creates content string and, if arguments are present, encodes them
         content = ""
         if args is not None:
             content = urllib.urlencode(args)
         
         content_length = len(content)
       
+        # Generates HTTP PoST request and adds encoded content
         request = "POST %s HTTP/1.1\r\n" % path
         request += "Host: %s\r\n" % net_loc
         request += "Content-Type: application/x-www-form-urlencoded\r\n"
@@ -150,6 +162,7 @@ class HTTPClient(object):
         
         data = self.recvall(s)
         
+        # parses received data from host
         code = self.get_code(data)
         body = self.get_body(data)
         
