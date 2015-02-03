@@ -7,3 +7,5 @@ Firefox Inspect Element network tool - used to see what headers are sent for sim
 https://docs.python.org/2/library/urlparse.html - used to understand usage of urlparse
 
 CMPUT 410 Lab 2 - lab example used for socket connection
+
+http://www.jmarshall.com/easy/http/#http1.1clients - used for additional info on HTTP request headers
